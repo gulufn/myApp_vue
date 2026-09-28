@@ -1,5 +1,5 @@
 <script lang="ts">
-export default {name: 'Video'}
+export default { name: 'Video' }
 </script>
 <script setup lang="ts">
 
@@ -7,10 +7,10 @@ export default {name: 'Video'}
 
 
 <template>
-  视频
+	<div>
+		视频
+	</div>
 </template>
-  
 
-<style lang="scss" scoped>
 
-</style>
+<style lang="scss" scoped></style>

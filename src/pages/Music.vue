@@ -1,18 +1,16 @@
 <script lang="ts">
-export default {name: 'Music'}
+export default { name: 'Music' }
 </script>
 <script setup lang="ts">
-  
+
 </script>
 
 
 <template>
-  <div>
-    音乐
-  </div>
+	<div>
+		音乐
+	</div>
 </template>
-  
 
-<style lang="scss" scoped>
 
-</style>
+<style lang="scss" scoped></style>
