@@ -26,7 +26,7 @@ let registerForm = reactive({
 	key: '',
 	idDisabled: false
 })
-let register_email_captcha_countdown = ref<any>('点击获取验证码')
+let register_email_captcha_countdown = ref<any>('获取验证码')
 async function register_send_picture_captcha_data() {
 	let data = await axios.get(`${API_BASE}` + '/user/get_picture_captcha')
 	registerForm.picture_captcha_url = `${API_BASE}` + data.data.message
@@ -106,7 +106,7 @@ const passwordlessLoginForm = reactive({
 	key: '',
 	idDisabled: false
 })
-let passwordlessLogin_email_captcha_countdown = ref<any>('点击获取验证码')
+let passwordlessLogin_email_captcha_countdown = ref<any>('获取验证码')
 async function passwordlessLogin_send_picture_captcha_data() {
 	let data = await axios.get(`${API_BASE}` + '/user/get_picture_captcha')
 	passwordlessLoginForm.picture_captcha_url = `${API_BASE}` + data.data.message
@@ -189,7 +189,7 @@ async function passwordlessLogin_send_form() {
 								</template>
 							</van-field>
 							<van-field v-model="registerForm.email_captcha" center clearable label="邮箱验证码"
-								placeholder="请输入邮箱验证码" type="text">
+								placeholder="请输入验证码" type="text">
 								<template #button>
 									<van-button size="small" type="primary" @click="register_send_email_captcha"
 										:disabled="registerForm.idDisabled">{{ register_email_captcha_countdown

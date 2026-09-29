@@ -2,11 +2,52 @@
 export default { name: 'App' }
 </script>
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
+import type { SearchInstance } from 'vant'
 import { useRoute } from 'vue-router'
-const onClickLeft = () => history.back();
+
 const route = useRoute()
-let msg = computed<string>(() => route.meta.title as string || '')
+const showSearch = ref(false)
+const msg = computed<string>(() => route.meta.title as string || '')
+const onClickLeft = () => history.back();
+const showSearchBtn = computed(() => route.meta.title === '音乐' || route.meta.title === '视频')
+
+// 搜索关键词,数据
+const keyword = ref('')
+
+// 取消搜索
+const cancelSearch = () => {
+	showSearch.value = false
+	keyword.value = ''
+}
+// 监听 showSearchBtn 的变化，如果为 false，则取消搜索
+watch(showSearchBtn, (val) => {
+	if (!val) { cancelSearch() }
+})
+// 监听路由变化，清空搜索框
+watch(msg, (val) => {
+	cancelSearch()
+})
+
+
+const searchInput = ref<SearchInstance | null>(null)  // 关键在这里
+// 打开时自动聚焦
+watch(showSearch, async (val) => {
+	if (val) {
+		await nextTick()
+		searchInput.value?.focus()  // 现在类型正确，不会报错
+	}
+})
+watch(keyword, (val) => {
+	console.log('搜索关键词:', val)
+})
+
+
+// 搜索方法
+const onSearch = () => {
+  console.log('搜索：', keyword.value)
+  // 调接口 / 跳转等
+}
 
 </script>
 <template>
@@ -19,9 +60,20 @@ let msg = computed<string>(() => route.meta.title as string || '')
 				<router-link to="/user">我的</router-link>
 			</nav>
 			<div class="title_show">
-				<van-nav-bar :title="msg" left-arrow @click-left="onClickLeft" />
+				<van-nav-bar v-if="!showSearch" :title="msg" left-arrow @click-left="onClickLeft">
+					<template #right v-if="showSearchBtn">
+						<van-icon name="search" size="18" @click="showSearch = true" />
+					</template>
+				</van-nav-bar>
+				<van-search v-else v-model="keyword" placeholder="请输入搜索关键词" show-action ref="searchInput" @search="onSearch">
+					<template #action>
+						<div @click="cancelSearch">取消</div>
+					</template>
+					<template #left>
+						<div @click="onSearch">搜索</div>
+					</template>
+				</van-search>
 			</div>
-
 
 		</header>
 		<main class="app-content">
