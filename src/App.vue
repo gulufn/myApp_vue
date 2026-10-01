@@ -5,6 +5,10 @@ export default { name: 'App' }
 import { ref, computed, watch, nextTick } from 'vue'
 import type { SearchInstance } from 'vant'
 import { useRoute } from 'vue-router'
+import { getToken, setToken, removeToken } from '@/utils/auth'
+import {useSearchStore} from '@/stores/search'
+
+const store = useSearchStore()
 
 const route = useRoute()
 const showSearch = ref(false)
@@ -27,6 +31,10 @@ watch(showSearchBtn, (val) => {
 // 监听路由变化，清空搜索框
 watch(msg, (val) => {
 	cancelSearch()
+	if(msg.value === '音乐'){store.thisPage = 'music'}
+	if(msg.value === '视频'){store.thisPage = 'video'}
+	store.token = getToken() || ''
+	
 })
 
 
@@ -40,6 +48,7 @@ watch(showSearch, async (val) => {
 })
 watch(keyword, (val) => {
 	console.log('搜索关键词:', val)
+	store.keyword = keyword.value  // 将搜索关键词存入 Pinia
 })
 
 
@@ -48,6 +57,13 @@ const onSearch = () => {
   console.log('搜索：', keyword.value)
   // 调接口 / 跳转等
 }
+
+
+
+
+
+
+
 
 </script>
 <template>
