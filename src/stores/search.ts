@@ -8,8 +8,8 @@ export const useSearchStore = defineStore('search', () => {
     let keyword = ref('')
     let thisPage = ref('')
     let searchTrigger = ref(0)
-    let listMusic = ref([])
-    let listVideo = ref([])
+    let listMusic = ref<any[]>([])
+    let listVideo = ref<any[]>([])
     // 触发搜索
     function triggerSearch() {
         searchTrigger.value++
@@ -19,18 +19,19 @@ export const useSearchStore = defineStore('search', () => {
         if (thisPage.value === 'music') {
             listMusic.value = []
             let data = await axios.post(`${API_BASE}` + '/music/search_music', {
-                token: token,
-                keyword: keyword
+                token: token.value,
+                keyword: keyword.value
             })
-            listMusic.value = data.data.data
+            listMusic.value = data.data.data.data
         } else if (thisPage.value === 'video') {
             listVideo.value = []
             let data = await axios.post(`${API_BASE}` + '/video/search_video', {
-                token: token,
-                keyword: keyword
+                token: token.value,
+                keyword: keyword.value
             })
-            listVideo.value = data.data.data
+            listVideo.value = data.data.data.data
         }
+        console.log('搜索结果:', listMusic.value, listVideo.value)
     }
     // 返回数据
     return { token, keyword, thisPage, searchTrigger, listMusic, listVideo, triggerSearch, search_data }

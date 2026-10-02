@@ -8,36 +8,25 @@ import { useRoute } from 'vue-router'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import {useSearchStore} from '@/stores/search'
 
-const store = useSearchStore()
-
+//和页面显示有关的
 const route = useRoute()
 const showSearch = ref(false)
 const msg = computed<string>(() => route.meta.title as string || '')
 const onClickLeft = () => history.back();
 const showSearchBtn = computed(() => route.meta.title === '音乐' || route.meta.title === '视频')
 
-// 搜索关键词,数据
-const keyword = ref('')
-
 // 取消搜索
 const cancelSearch = () => {
 	showSearch.value = false
 	keyword.value = ''
 }
+
 // 监听 showSearchBtn 的变化，如果为 false，则取消搜索
 watch(showSearchBtn, (val) => {
 	if (!val) { cancelSearch() }
 })
-// 监听路由变化，清空搜索框
-watch(msg, (val) => {
-	cancelSearch()
-	if(msg.value === '音乐'){store.thisPage = 'music'}
-	if(msg.value === '视频'){store.thisPage = 'video'}
-	store.token = getToken() || ''
-	
-})
 
-
+//聚焦
 const searchInput = ref<SearchInstance | null>(null)  // 关键在这里
 // 打开时自动聚焦
 watch(showSearch, async (val) => {
@@ -46,6 +35,21 @@ watch(showSearch, async (val) => {
 		searchInput.value?.focus()  // 现在类型正确，不会报错
 	}
 })
+
+const store = useSearchStore()
+// 搜索关键词,数据
+const keyword = ref('')
+
+// 监听路由变化，清空搜索框
+watch(msg, (val) => {
+	cancelSearch()
+	if(msg.value === '音乐'){store.thisPage = 'music'}
+	if(msg.value === '视频'){store.thisPage = 'video'}
+	store.token = getToken() || ''
+	store.searchTrigger=0
+	
+})
+
 watch(keyword, (val) => {
 	console.log('搜索关键词:', val)
 	store.keyword = keyword.value  // 将搜索关键词存入 Pinia
@@ -55,12 +59,10 @@ watch(keyword, (val) => {
 // 搜索方法
 const onSearch = () => {
   console.log('搜索：', keyword.value)
+  store.searchTrigger =store.searchTrigger+1
+  
   // 调接口 / 跳转等
 }
-
-
-
-
 
 
 
