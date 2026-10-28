@@ -16,7 +16,15 @@ const routes = [
 		name: 'video',
 		path: '/video',
 		component: video_page,
-		meta: { title: '视频' }
+		meta: { title: '视频' },
+		children: [
+			{
+				name: 'video-detail',
+				path: 'detail/:idx',    // 最终访问 /video/detail/123
+				component: () => import('@/pages/VideoDetails.vue'),
+				meta: { title: '视频详情' }
+			},
+		]
 	},
 	{
 		name: 'music',

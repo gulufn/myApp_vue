@@ -2,13 +2,17 @@
 export default { name: 'Music' }
 </script>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch ,computed} from 'vue'
 import axios from 'axios'
-import { API_BASE } from '@/config.ts'
+import { API_BASE,API_BASE_MUSIC } from '@/config.ts'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { showSuccessToast, showFailToast, Button } from 'vant';
 import { useSearchStore } from '@/stores/search'
 
+
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const isDetail = computed(() => route.name === 'video-detail')
 let index = 0;
 const token = getToken()
 let key = ref('')
@@ -59,7 +63,6 @@ async function onRefresh() {
 	store.listMusic = []
 	finished.value = false
 	get_music_list()
-	get_music_list()
 		.then(() => {
 			refreshing.value = false
 		})
@@ -91,15 +94,15 @@ watch(() => store.keyword, (val) => {
 	store.search_data()
 })
 let musicUrl = ref('')
-function bofang(vs :string){
-	musicUrl.value='http://127.0.0.1:3000/music/'+vs
+function bofang(name :string) {
+	musicUrl.value=API_BASE_MUSIC+'/music/'+name+'?key='+key.value
 }
 
 </script>
 <template>
 	<div class="page">
 		<div class="list-wrap">
-			<van-pull-refresh v-model="refreshing" @refresh="onRefresh">
+			<van-pull-refresh v-model="refreshing" @refresh="onRefresh" v-if="!isDetail">
 				<van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad"
 					:offset="50">
 					<van-cell v-for="item in store.listMusic" :key="item.id" :title="item.title" :label="item.artist"
