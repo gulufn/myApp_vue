@@ -5,6 +5,7 @@ export default { name: 'profile' }
 import { ref, computed } from 'vue'
 import { emailStore } from '@/stores/user_data'
 import { useRouter, useRoute } from 'vue-router'
+import { getToken, setToken, removeToken } from '@/utils/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -40,6 +41,8 @@ const user_setting = () => {
 }
 const login_out = () => {
 	console.log('退出登录')
+	removeToken()
+	 window.location.href = '/user'
 }
 </script>
 
