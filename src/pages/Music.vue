@@ -12,7 +12,7 @@ import { useSearchStore } from '@/stores/search'
 
 import { useRoute } from 'vue-router'
 const route = useRoute()
-const isDetail = computed(() => route.name === 'video-detail')
+
 let index = 0;
 const token = getToken()
 let key = ref('')
@@ -29,6 +29,9 @@ async function get_music_list() {
 		status.value = 1
 		key.value = data.data.data.key
 		const list = data.data.data.data;
+		if(index==0){
+			store.listMusic=[]	
+		}
 		store.listMusic.push(...list)
 		console.log('音乐列表:', store.listMusic)
 
@@ -72,8 +75,6 @@ async function onRefresh() {
 }
 async function toggleFavorite(item: any) {
 	console.log('切换收藏:', item)
-
-
 	let data = await axios.post(`${API_BASE}` + '/music/toggle_favorites', {
 		token: token,
 		music_id: item.id,
@@ -102,7 +103,7 @@ function bofang(name :string) {
 <template>
 	<div class="page">
 		<div class="list-wrap">
-			<van-pull-refresh v-model="refreshing" @refresh="onRefresh" v-if="!isDetail">
+			<van-pull-refresh v-model="refreshing" @refresh="onRefresh">
 				<van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad"
 					:offset="50">
 					<van-cell v-for="item in store.listMusic" :key="item.id" :title="item.title" :label="item.artist"

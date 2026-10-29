@@ -10,16 +10,21 @@ import { showSuccessToast, showFailToast, Button } from 'vant';
 import { useSearchStore } from '@/stores/search'
 import { useWindowSize } from '@vant/use'
 import { useRouter, useRoute } from 'vue-router'
+import FlvJs from 'flv.js';
 
 
 const store = useSearchStore()
+console.log('进入页面时 listVideo:', store.listVideo)
+console.log('iiiii',store.listVideo.length)
 const route = useRoute()
 
 const key = ref(route.query.key)
-const index = ref(Number(route.params.idx))
+const index = ref(Number(route.params.id))
 const order = ref('0001')
 
-
+console.log('length:', store.listVideo?.length)
+console.log('same ref:', store.listVideo === store.$state.listVideo)
+console.log('first:', store.listVideo?.[0])
 
 
 const path = ref('')
@@ -30,28 +35,40 @@ const id = ref()
 const title = ref()
 const episodes = ref()
 
-const item = store.listVideo?.[4]
+const list = ref()
+
+const item = store.listVideo?.length ?? 0
+
 if (item) {
-    path.value = store.listVideo[index.value]['path']
-    leixing.value = store.listVideo[index.value]['class']
-    sources.value = store.listVideo[index.value]['sources']
-    is_favorite.value = store.listVideo[index.value]['is_favorite']
-    id.value = store.listVideo[index.value]['id']
-    title.value = store.listVideo[index.value]['title']
-    episodes.value = store.listVideo[index.value]['episodes']
+    console.log('有list')
+    for (const i of store.listVideo) {
+        if (i['id'] === index.value) {
+            list.value = i
+            break
+        }
+    }
+    console.log('有list')
+    path.value = list.value['path']
+    leixing.value = list.value['class']
+    sources.value = list.value['sources']
+    is_favorite.value = list.value['is_favorite']
+    id.value = list.value['id']
+    title.value = list.value['title']
+    episodes.value = list.value['episodes']
 
     const video_details = {
-        'class': store.listVideo[index.value]['class'],
-        'cover_image': store.listVideo[index.value]['cover_image'],
-        'episodes': store.listVideo[index.value]['episodes'],
-        'id': store.listVideo[index.value]['id'],
-        'is_favorite': store.listVideo[index.value]['is_favorite'],
-        'path': store.listVideo[index.value]['path'],
-        'sources': store.listVideo[index.value]['sources'],
-        'title': store.listVideo[index.value]['title']
+        'class': list.value['class'],
+        'cover_image': list.value['cover_image'],
+        'episodes': list.value['episodes'],
+        'id': list.value['id'],
+        'is_favorite': list.value['is_favorite'],
+        'path': list.value['path'],
+        'sources': list.value['sources'],
+        'title': list.value['title']
     }
     localStorage.setItem('video_details', JSON.stringify(video_details))
 } else {
+    console.log('没有list',list.value)
     const raw = localStorage.getItem('video_details')
     const video_details = raw ? JSON.parse(raw) : null
     console.log('dfggfdsgf', video_details)
@@ -74,7 +91,7 @@ onMounted(() => {
     const video = videoRef.value
     if (!video) return
     if (sources.value.split('.').pop() === 'flv') {
-        const player = flvjs.createPlayer({
+        const player = FlvJs.createPlayer({
             type: 'flv',
             url: video_url.value
         });
@@ -107,7 +124,7 @@ watch(video_url, async (url) => {
     const video = videoRef.value
     if (!video) return
     if (sources.value.split('.').pop() === 'flv') {
-        const player = mpegts.createPlayer({
+        const player = FlvJs.createPlayer({
             type: 'flv',
             url: url
         }, {
@@ -130,17 +147,12 @@ watch(video_url, async (url) => {
 })
 
 
-// let is_favorite = ref(is_favorite.value)
-
-
 async function toggleStar() {
     console.log('切换收藏:', is_favorite.value)
     console.log(id.value);
     let data = await axios.post(`${API_BASE}` + '/video/toggle_favorites', {
         token: token,
         video_id: id.value,
-
-
         is_favorite: is_favorite.value
     })
     if (data.data.status == 1) {
@@ -150,10 +162,10 @@ async function toggleStar() {
         showFailToast(data.data.message)
     }
     is_favorite.value = !is_favorite.value
-    if(item){
+    if (item) {
         store.listVideo[index.value]['is_favorite'] = !store.listVideo[index.value]['is_favorite']
     }
-    
+
 }
 
 </script>

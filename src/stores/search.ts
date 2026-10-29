@@ -1,7 +1,8 @@
 import { ref, reactive } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { API_BASE } from '@/config.ts'
+import { API_BASE ,API_BASE_VIDEO} from '@/config.ts'
+
 
 export const useSearchStore = defineStore('search', () => {
     let token = ref('')
@@ -24,14 +25,25 @@ export const useSearchStore = defineStore('search', () => {
             })
             listMusic.value = data.data.data.data
         } else if (thisPage.value === 'video') {
-            listVideo.value = []
+            // listVideo.value = []
             let data = await axios.post(`${API_BASE}` + '/video/search_video', {
                 token: token.value,
                 keyword: keyword.value
             })
-            listVideo.value = data.data.data.data
+            const key = data.data.data.key
+            const list = data.data.data.data;
+            for (const i of list) {
+                const url = API_BASE_VIDEO + '/video/' + i.name + '?key=' + key + '&form=' + i.form;
+                const video_json = await axios.get(url)
+                // console.log('js',i['id'])
+                video_json['data']['data']['id'] = i['id']
+                video_json['data']['data']['is_favorite'] = i['is_favorite']
+                if (video_json['data']['status']) {
+                    listVideo.value.push(video_json['data']['data'])
+                    listVideo.value.unshift(video_json['data']['data'])
+                }
+            }
         }
-        console.log('搜索结果:', listMusic.value, listVideo.value)
     }
     // 返回数据
     return { token, keyword, thisPage, searchTrigger, listMusic, listVideo, triggerSearch, search_data }

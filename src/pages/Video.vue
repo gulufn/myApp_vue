@@ -41,8 +41,8 @@ async function get_video_list() {
 		for (const i of list) {
 			const url = API_BASE_VIDEO + '/video/' + i.name + '?key=' + key.value + '&form=' + i.form;
 			const video_json = await axios.get(url)
-			video_json['data']['data']['id']=i['id']
-			video_json['data']['data']['is_favorite']=i['is_favorite']
+			video_json['data']['data']['id'] = i['id']
+			video_json['data']['data']['is_favorite'] = i['is_favorite']
 			if (video_json['data']['status']) {
 				store.listVideo.push(video_json['data']['data'])
 			}
@@ -95,17 +95,24 @@ watch(() => width.value, (val) => {
 })
 
 let v = ref('')
-function videoUrl(idx: any,key:any) {
+function videoUrl(id: any, key: any) {
 	//   v.value= `${API_BASE_VIDEO}/video/${item.path}?key=${key.value}&form=${item.form}&file_source=bbb.mp4`
 	// router.push(`/video/detail/${idx}`,)   // 直接拼路径
-	router.push({ name: 'video-detail', params: { idx }, query: { key: key } })
+	router.push({ name: 'video-detail', params: { id }, query: { key: key } })
 }
+watch(() => store.keyword, async (val) => {
+	console.log('video搜索关键词:', val)
+	await store.search_data()
+	const item = store.listVideo?.[0]
+    console.log(item ? '有数据' : '没有数据')
+})
 </script>
 <template>
 	<div>
-		<van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad" v-show="!isDetail" :offset="10">
-			<van-grid :border="false" :column-num=columnNum class="video-grid" v-if="!isDetail">
-				<van-grid-item v-for="(item, idx) in store.listVideo" :title="item.title" @click="videoUrl(idx,key)">
+		<van-list v-model:loading="loading" :finished="finished" finished-text="没有更多了" @load="onLoad" v-show="!isDetail"
+			:offset="10">
+			<van-grid :border="false" :column-num=columnNum class="video-grid" v-show="!isDetail">
+				<van-grid-item v-for="(item) in store.listVideo" :title="item.title" @click="videoUrl(item.id, key)">
 					<van-image width="178" height="100" fit="cover"
 						:src="`${API_BASE_VIDEO}/video/${item.path}?key=${key}&form=${item.class}&file_source=img.png`"
 						@click="" />
@@ -113,7 +120,7 @@ function videoUrl(idx: any,key:any) {
 				</van-grid-item>
 			</van-grid>
 		</van-list>
-		
+
 		<router-view />
 	</div>
 

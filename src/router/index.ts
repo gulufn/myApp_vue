@@ -20,7 +20,7 @@ const routes = [
 		children: [
 			{
 				name: 'video-detail',
-				path: 'detail/:idx',    // 最终访问 /video/detail/123
+				path: 'detail/:id',    // 最终访问 /video/detail/123
 				component: () => import('@/pages/VideoDetails.vue'),
 				meta: { title: '视频详情' }
 			},
@@ -36,7 +36,25 @@ const routes = [
 		name: 'user',
 		path: '/user',
 		component: user_page,
-		meta: { title: '我的' }
+		meta: { title: '我的' },
+		children: [
+			{
+				name: 'video_collect',
+				path: 'video_collect',
+				component: () => import('@/pages/VideoCollect.vue'),
+				meta: { title: '视频收藏' }
+			},{
+				name: 'music_collect',
+				path: 'music_collect',
+				component: () => import('@/pages/MusicCollect.vue'),
+				meta: { title: '音乐收藏' }
+			},{
+				name: 'user_setting',
+				path: 'user_setting',
+				component: () => import('@/pages/UserSetting.vue'),
+				meta: { title: '账号设置' }
+			},
+		]
 	}
 ]
 
